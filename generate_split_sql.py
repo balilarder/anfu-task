@@ -31,6 +31,7 @@ from pathlib import Path
 import os
 import pyodbc
 import pandas as pd
+import argparse
 
 # DB config
 server = os.getenv('AVM_DB_HOST')
@@ -125,10 +126,10 @@ def generate_script(county, table, base_path):
     for cn in column_name[:-1]:
         insert_query += f"[{cn}], "
     insert_query += f"[{column_name[-1]}]) VALUES "
-
+    print(column_name)
     print(data_type)  # ["int"-int, "varchar"-str, "decimal"-decimal.Decimal, "datetime"-datetime.datetime]
 
-    query_str = f"select * from moi_avm.dbo.{table} where county = '{county}'"
+    query_str = f"select top 10000 * from moi_avm.dbo.{table} where county = '{county}'"
     query_result = cur.execute(query_str)
     
     X = 200000
@@ -156,11 +157,6 @@ def generate_script(county, table, base_path):
                         continue
                     data += f"CAST({r[col_cnt]} AS Decimal(18, 2)), "
                 elif data_type[col_cnt] == "datetime":
-                    # try1
-                    # print(f"split datetime")
-                    # print(str(r[col_cnt]).split(' '))
-                    # part1, part2 = str(r[col_cnt]).split(' ')
-                    # print(part1, part2, type(part1), type(part2), r[col_cnt], type(r[col_cnt]))
                     format_date = r[col_cnt].strftime("%Y-%m-%dT%H:%M:%S")
                     data += f"CAST(N'{format_date}' AS DateTime), "
             data = data[:-2] + ')'
@@ -170,12 +166,16 @@ def generate_script(county, table, base_path):
     print(f"total {i} result")
 
 # main
-base_path = "C:\\tmp\\20220406_updateDB\\poi_data_python\\"
-for i in Path(base_path).glob('*.sql'):
-    i.unlink()
-
 # for county in all_county:
 #     generate_script_poi_data(county, base_path)
 
+parser = argparse.ArgumentParser()
+parser.add_argument("arg1", help="1 argument, [TABLE_NAME]")
+args = parser.parse_args()
+
+base_path = f"C:\\tmp\\20220406_updateDB\\{args.arg1}_python\\"
+for i in Path(base_path).glob('*.sql'):
+    i.unlink()
+
 for county in all_county:
-    generate_script(county, 'poi_data', base_path)
+    generate_script(county, args.arg1, base_path)
