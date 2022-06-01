@@ -102,6 +102,7 @@ CREATE TABLE [dbo].[parking_adjust](
 	[created_at] [datetime] NOT NULL,
 	[updated_at] [datetime] NULL
 ) ON [PRIMARY]
+
 """
 
 CREATE_MASTER_TABLE = """
@@ -193,4 +194,5 @@ CREATE TABLE [dbo].[master](
 	[id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
 """
